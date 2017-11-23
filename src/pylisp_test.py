@@ -62,10 +62,6 @@ class TestLexer(unittest.TestCase):
         self.assertEqual(("RPAR", ")"), lexer.get_token())
 
 
-
-
-
-
 class TestSexpReader(unittest.TestCase):
     @staticmethod
     def create_reader(s):
@@ -116,7 +112,6 @@ class TestSexpReader(unittest.TestCase):
         self.assertIsInstance(pair2.car, TSymbol)
         self.assertEqual("b", pair2.car.name)
         self.assertIsInstance(pair2.cdr, TNull)
-
 
 
 if __name__ == '__main__':
