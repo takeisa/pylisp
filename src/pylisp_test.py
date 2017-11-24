@@ -114,5 +114,43 @@ class TestSexpReader(unittest.TestCase):
         self.assertIsInstance(pair2.cdr, TNull)
 
 
+class TestObjectPrint(unittest.TestCase):
+    def test_string(self):
+        sut = TString("abc")
+        self.assertEqual("\"abc\"", str(sut))
+
+    def test_symbol(self):
+        sut = TSymbol("abc")
+        self.assertEqual("abc", str(sut))
+
+    def test_number(self):
+        sut = TNumber(123)
+        self.assertEqual("123", str(sut))
+
+    def test_null(self):
+        sut = TNull()
+        self.assertEqual("()", str(sut))
+
+    def test_pair(self):
+        sut = TPair(TSymbol("a"), TSymbol("b"))
+        self.assertEqual("(a . b)", str(sut))
+
+    def test_pair_list_1(self):
+        sut = TPair(TSymbol("a"), TNull())
+        self.assertEqual("(a)", str(sut))
+
+    def test_pair_list_2(self):
+        sut = TPair(TSymbol("a"), TPair(TSymbol("b"), TNull()))
+        self.assertEqual("(a b)", str(sut))
+
+    def test_pair_list_2_dot(self):
+        sut = TPair(TSymbol("a"), TPair(TSymbol("b"), TSymbol("c")))
+        self.assertEqual("(a b . c)", str(sut))
+
+    def test_pair_list_in_list(self):
+        sut = TPair(TSymbol("a"), TPair(TPair(TSymbol("b"), TPair(TSymbol("c"), TNull())), TPair(TSymbol("d"), TNull())))
+        self.assertEqual("(a (b c) d)", str(sut))
+
+
 if __name__ == '__main__':
     unittest.main()
