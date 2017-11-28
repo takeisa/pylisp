@@ -1,7 +1,8 @@
 import unittest
 import io
-from pylisp import Reader, Lexer, SexpReader, TSyntaxError
+from pylisp import Reader, Lexer, SexpReader, TSyntaxError, Eval
 from object import TString, TNumber, TSymbol, TPair, TNull
+from vm import VM, Env, Halt, Refer, Constant, Assign
 
 
 class TestReader(unittest.TestCase):
@@ -150,6 +151,57 @@ class TestObjectPrint(unittest.TestCase):
     def test_pair_list_in_list(self):
         sut = TPair(TSymbol("a"), TPair(TPair(TSymbol("b"), TPair(TSymbol("c"), TNull())), TPair(TSymbol("d"), TNull())))
         self.assertEqual("(a (b c) d)", str(sut))
+
+
+class TestEval(unittest.TestCase):
+    @staticmethod
+    def read(s):
+        return SexpReader(io.StringIO(s)).read()
+
+    @staticmethod
+    def eval(s):
+        return Eval().eval(TestEval.read(s))
+
+    def test_number(self):
+        obj = TestEval.eval("123")
+        self.assertEqual(123, obj.value)
+
+
+class TestVM(unittest.TestCase):
+    def setUp(self):
+        self.vm = VM()
+
+    def test_halt(self):
+        self.vm.reg.a = TString("halt")
+        self.vm.reg.x = Halt()
+        self.vm.run()
+        a = self.vm.reg.a
+        self.assertIsInstance(a, TString)
+        self.assertEqual("halt", a.value)
+
+    def test_constant(self):
+        self.vm.reg.x = Constant(TString("constant"), Halt())
+        self.vm.run()
+        a = self.vm.reg.a
+        self.assertIsInstance(a, TString)
+        self.assertEqual("constant", a.value)
+
+    def test_refer(self):
+        self.vm.reg.e = Env(["foo"], [TString("foo_val")], None)
+        self.vm.reg.x = Refer("foo", Halt())
+        self.vm.run()
+        a = self.vm.reg.a
+        self.assertIsInstance(a, TString)
+        self.assertEqual("foo_val", a.value)
+
+    def test_assign(self):
+        self.vm.reg.e = Env(["foo"], [TString("foo_val")], None)
+        self.vm.reg.a = TString("foo_val_2")
+        self.vm.reg.x = Assign("foo", Halt())
+        self.vm.run()
+        val = self.vm.reg.e.look_up("foo")
+        self.assertIsInstance(val, TString)
+        self.assertEqual("foo_val_2", val.value)
 
 
 if __name__ == '__main__':

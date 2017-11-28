@@ -107,6 +107,10 @@ class SexpReader:
     def __init__(self, stream=sys.stdin):
         self.lexer = Lexer(Reader(stream))
 
+    # (a b c . d)
+    # -> (pair a (pair b (pair c . d)))
+    # (a b c d)
+    # -> (pair a (pair b (pair c (pair d nil))))
     def read_pair(self):
         token = self.lexer.get_token()
         token_type, token_value = token
@@ -147,15 +151,10 @@ class SexpReader:
 
         return obj
 
-# (a b c . d)
-# -> (pair a (pair b (pair c . d)))
-# (a b c d)
-# -> (pair a (pair b (pair c (pair d nil))))
 
-# (
-# ) -> null ()
-# . -> error
-# _ -> (cons car (read
+class Eval:
+    def eval(self, expr):
+        return TNumber(123)
 
 
 def repl():
