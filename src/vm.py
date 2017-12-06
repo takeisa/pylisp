@@ -1,3 +1,6 @@
+from object import TClosure
+
+
 class VM:
     def __init__(self):
         self.reg = Register()
@@ -75,4 +78,15 @@ class Assign:
 
     def exec(self, reg):
         reg.e.set(self.var, reg.a)
+        reg.x = self.x
+
+
+class Closure:
+    def __init__(self, vars, body, x):
+        self.vars = vars
+        self.body = body
+        self.x = x
+
+    def exec(self, reg):
+        reg.a = TClosure(self.body, reg.e, self.vars)
         reg.x = self.x

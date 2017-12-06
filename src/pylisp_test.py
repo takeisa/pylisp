@@ -1,8 +1,8 @@
 import unittest
 import io
 from pylisp import Reader, Lexer, SexpReader, TSyntaxError, Eval
-from object import TString, TNumber, TSymbol, TPair, TNull
-from vm import VM, Env, Halt, Refer, Constant, Assign
+from object import TString, TNumber, TSymbol, TPair, TNull, TClosure
+from vm import VM, Env, Halt, Refer, Constant, Assign, Closure
 
 
 class TestReader(unittest.TestCase):
@@ -187,8 +187,8 @@ class TestVM(unittest.TestCase):
         self.assertEqual("constant", a.value)
 
     def test_refer(self):
-        self.vm.reg.e = Env(["foo"], [TString("foo_val")], None)
-        self.vm.reg.x = Refer("foo", Halt())
+        self.vm.reg.e = Env([TSymbol("foo")], [TString("foo_val")], None)
+        self.vm.reg.x = Refer(TSymbol("foo"), Halt())
         self.vm.run()
         a = self.vm.reg.a
         self.assertIsInstance(a, TString)
@@ -202,6 +202,13 @@ class TestVM(unittest.TestCase):
         val = self.vm.reg.e.look_up("foo")
         self.assertIsInstance(val, TString)
         self.assertEqual("foo_val_2", val.value)
+
+    def test_closure(self):
+        self.vm.reg.e = Env(["foo"], [TNumber(10)], None)
+        self.vm.reg.x = Closure([TSymbol("a"), TSymbol("b")], None, Halt())
+        self.vm.run()
+        a = self.vm.reg.a
+        self.assertIsInstance(a, TClosure)
 
 
 if __name__ == '__main__':

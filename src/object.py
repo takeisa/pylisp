@@ -25,6 +25,12 @@ class TSymbol:
     def __str__(self):
         return self.name
 
+    def __hash__(self):
+        return hash(self._name)
+
+    def __eq__(self, other):
+        return self._name == other._name
+
 
 class TPair:
     def __init__(self, car, cdr):
@@ -62,3 +68,10 @@ class TPair:
 class TNull:
     def __str__(self):
         return "()"
+
+
+class TClosure:
+    def __init__(self, body, env, vars):
+        self.body = body
+        self.enf = env
+        self.vars = vars

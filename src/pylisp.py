@@ -1,6 +1,8 @@
 import sys
 import re
 from object import *
+from compiler import compile
+from vm import VM
 
 
 class Reader:
@@ -153,17 +155,27 @@ class SexpReader:
 
 
 class Eval:
+    def __init__(self):
+        self.vm = VM()
+
     def eval(self, expr):
-        return TNumber(123)
+        compiled_expr = compile(expr)
+        print("compiled_expr:", compiled_expr)
+        self.vm.reg.x = compiled_expr
+        self.vm.run()
+        return self.vm.reg.a
 
 
 def repl():
     reader = SexpReader(sys.stdin)
+    evaluator = Eval()
     while True:
         print(">> ", end="")
         sys.stdout.flush()
-        obj = reader.read()
-        print(obj)
+        expr = reader.read()
+        print("read:", expr)
+        expr = evaluator.eval(expr)
+        print("eval:", expr)
         sys.stdout.flush()
 
 
